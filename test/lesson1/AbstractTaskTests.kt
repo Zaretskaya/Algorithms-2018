@@ -1,7 +1,9 @@
 package lesson1
 
+import org.junit.jupiter.api.assertThrows
 import java.io.BufferedWriter
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.*
 import kotlin.math.abs
 
@@ -39,6 +41,15 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        try {
+            assertThrows<FileNotFoundException> { sortTimes("AAA", "FileNotFound.txt") }
+            assertThrows<IllegalArgumentException> {
+                sortTimes("input/unexpected.txt", "Impossible.txt")
+            }
+        } finally {
+            File("FileNotFound.txt").delete()
+            File("Impossible.txt").delete()
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
@@ -55,6 +66,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
     }
 
     private fun generateTemperatures(size: Int) {

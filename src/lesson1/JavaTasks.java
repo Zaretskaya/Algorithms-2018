@@ -2,6 +2,16 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -62,8 +72,123 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
+
+
+    public static String[] openFile(String inputFile) throws IOException{
+        BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+        String str;
+
+        ArrayList<String> list = new ArrayList<>();
+        while((str = reader.readLine()) != null ){
+            if(!str.isEmpty()){
+                list.add(str);
+                System.out.println(str);
+            }}
+        String[] stringArr = list.toArray(new String[0]);
+        return stringArr;
+    }
+
     static public void sortAddresses(String inputName, String outputName) {
-        throw new NotImplementedError();
+
+        String [][] masInName;
+        String [] tmpInName;
+        double [] tmpInNameD;
+        int [] tmpInNameI;
+
+
+
+        String [] sortFl;
+        String [] sortFlsum;
+
+        int countSTR = 0;
+        int e = 0;
+        int indexSMB = 0;
+        int [] k;//динамический параметр, который отслеживает реальные адресы жильцов
+        //в базе после операций сортировок исходных данных в файле inputName
+        //значения его номеров помогает выбирать окончательные позиции в базе
+        //НАПРИМЕР: [Садовая 5 - Сидоров Петр, Сидорова Мария] а не
+        //Садовая 5 - Сидоров Петр или Садовая 5 - Сидоров Мария
+        int kk = 0;
+        try {
+            tmpInName = openFile(inputName);
+            Sorts.insertionSort(tmpInName);
+            countSTR = tmpInName.length;
+            masInName = new String [countSTR][3];
+            //из формата: [Сидоров Петр - Садовая 5]; [Сидорова Мария - Садовая 5]
+            //в формат: [Садовая 5 - Сидоров Петр, Сидорова Мария]
+            k = new int [countSTR];
+            masInName[0][0] = tmpInName[0];
+            indexSMB = tmpInName[e].lastIndexOf("-");
+            String address = tmpInName[0].substring(indexSMB + 2, tmpInName[0].length());
+            String nameUs = tmpInName[0].substring(0,indexSMB - 1);
+            for (e=0; e<countSTR; ++e){
+                indexSMB = tmpInName[e].lastIndexOf("-");
+                String addressTec = tmpInName[e].substring(indexSMB + 2, tmpInName[e].length());
+                String nameUsTec = tmpInName[e].substring(0,indexSMB - 1);
+                masInName[e][0] = addressTec;
+                masInName[e][1] = nameUsTec;
+                int d = masInName[e][0].compareTo(address);
+                int f = nameUs.compareTo(nameUsTec);
+                if (d == 0 & f != 0 ){
+                    masInName[e][1] = masInName[e - 1][1] +", " + nameUsTec;
+                    masInName[kk][2] = masInName[e][0] + " - " + masInName[e][1];
+                    nameUs = nameUsTec;
+                    address = addressTec;
+                    k[kk] = e-1;
+                    ++kk;
+                }else{
+                    if(address.compareTo(addressTec) != 0){
+                        masInName[kk][2] = masInName[e][0] + " - " + nameUsTec;
+                        address = addressTec;
+                        k[kk] = e-2;
+                        ++kk;
+                    }
+                    k[kk] = e-1;
+                }
+            }
+            int tt = 0;
+            int tecSTR = 0;
+            sortFl = new String [countSTR];
+            for (e=1; e<countSTR; ++e){
+                tt = e+1;
+                String t1 = masInName[e][2];
+                String t2 = masInName[k[e]][2];
+                if(tt < countSTR){String t3 = masInName[k[e+1]][2];
+                    int a = t2.compareTo(t3);
+                    if(masInName[e][2] != null & a != 0){++tecSTR;}}
+                    //определяем значение счетчика окончательных записей [tecSTR] координат жильцов
+            }
+            sortFl = new String [tecSTR];
+            tecSTR = 0;
+            for (e=1; e<countSTR; ++e){
+                tt = e+1;
+                String t1 = masInName[e][2];
+                String t2 = masInName[k[e]][2];
+                if(tt < countSTR){String t3 = masInName[k[e+1]][2];
+                    int a = t2.compareTo(t3);
+                    if(masInName[e][2] != null & a != 0){sortFl[tecSTR] = masInName[k[e]][2];++tecSTR;}}
+                    //записываем адресы жильцов в сортировочный массив
+            }
+
+            Sorts.insertionSort(sortFl);
+            sortFlsum = new String [tecSTR];
+            for (e=0; e<tecSTR; ++e){
+                sortFlsum[e] = sortFl[e];
+
+            }
+
+            FileWriter fw = new FileWriter(outputName);
+            for(int i = 0; i<sortFlsum.length; i++) {
+                fw.write(sortFlsum[i]);
+                fw.write("\n");
+            }
+            fw.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        /* ресурсоемкость = O(n)
+           трудоемкость = O(n*log(n))
+         */
     }
 
     /**
@@ -97,7 +222,28 @@ public class JavaTasks {
      * 121.3
      */
     static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try {
+            Scanner sc = new Scanner(new FileReader(inputName));
+            List<Double> list = new ArrayList<>();
+            while (sc.hasNextLine())
+                list.add(Double.parseDouble(sc.nextLine()));
+            sc.close();
+            Collections.sort(list);
+
+
+            FileWriter fw = new FileWriter(outputName);
+            for(int i = 0; i<list.size();i++) {
+                fw.write(list.get(i).toString());
+                fw.write("\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.out.print("Файл не найден");
+            e.printStackTrace();
+        }
+        /* ресурсоемкость = O(n)
+           трудоемкость = O(n*log(n))
+         */
     }
 
     /**
@@ -131,6 +277,31 @@ public class JavaTasks {
      */
     static public void sortSequence(String inputName, String outputName) {
         throw new NotImplementedError();
+       /* try {
+            String[] tmpInNameI;
+            tmpInNameI = openFile(inputName);//читаем содержимое inputName1 и записываем строки в массив
+
+
+            Sorts.insertionSort(tmpInNameI);//предварительная сортировка строк из файла inputName1
+            String [] tmpInNameIS;
+            tmpInNameIS = new String [tmpInNameI.length];
+            for(int h=0;h<tmpInNameI.length;++h){
+                tmpInNameIS[h] = String.valueOf(tmpInNameI[h]);
+            }
+
+            FileWriter fw = new FileWriter(outputName);
+            for(int i = 0; i<list.size();i++) {
+                fw.write(list.get(i));
+                fw.write("\n");
+            }
+            fw.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+*/
+
     }
 
     /**

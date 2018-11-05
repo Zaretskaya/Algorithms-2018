@@ -3,6 +3,7 @@ package lesson2;
 import kotlin.NotImplementedError;
 import kotlin.Pair;
 
+import java.io.IOException;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -82,8 +83,19 @@ public class JavaAlgorithms {
      * Х х Х
      */
     static public int josephTask(int menNumber, int choiceInterval) {
-        throw new NotImplementedError();
+        int survivor = 0;
+        if (menNumber == 1)
+            return 1;
+        else for (int k = 1; k < menNumber; k++) {
+            survivor = (survivor + choiceInterval) % (k + 1);
+        }
+        return survivor + 1;
+        /* ресурсоемкость = O(1)
+           трудоемкость = O(n)
+         */
     }
+
+
 
     /**
      * Наибольшая общая подстрока.
@@ -96,9 +108,42 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+    static public String longestCommonSubstring(String first, String second) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        if (first == null || first.isEmpty() || second == null || second.isEmpty()) return "";
+
+        int[][] number = new int[first.length()][second.length()];
+        int maxlength = 0;
+        int secondOne = 0;
+
+        for (int i = 0; i < first.length(); i++) {
+            for (int k = 0; k < second.length(); k++) {
+                if (first.charAt(i) == second.charAt(k)) {
+                    if ((i == 0) || (k == 0))
+                        number[i][k] = 1;
+                    else
+                        number[i][k] = 1 + number[i - 1][k - 1];
+
+                    if (number[i][k] > maxlength) {
+                        maxlength = number[i][k];
+                        int firstOne = i - number[i][k] + 1;
+                        if (secondOne == firstOne) {
+                            sb.append(first.charAt(i));
+                        } else {
+                            secondOne = firstOne;
+                            sb = new StringBuilder();
+                            sb.append(first.substring(secondOne, i + 1));
+                        }
+                    }
+                }
+            }
+        }
+        return sb.toString();
+        /* ресурсоемкость = O(firstOne * secondOne)
+           трудоемкость = O(firstOne * secondOne)
+        */
     }
+
 
     /**
      * Число простых чисел в интервале
@@ -112,6 +157,7 @@ public class JavaAlgorithms {
      */
     static public int calcPrimesNumber(int limit) {
         throw new NotImplementedError();
+
     }
 
     /**
