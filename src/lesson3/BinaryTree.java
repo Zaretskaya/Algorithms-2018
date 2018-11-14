@@ -172,8 +172,43 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        /* трудоемкость =
+           ресурсоемкость =
+        */
+        TreeSet<T> treeSet = new TreeSet<>();
+
+        if (root == null) return treeSet; // Если дерево пустое, возвращаем пустое множество
+
+        int comparison = first().compareTo(toElement);
+        if (comparison > 0) return treeSet; // Если первый элемент больше заданного, также возвращаем пустое множество
+
+        comparison = last().compareTo(toElement);
+        if (comparison < 0) {
+            addSet(treeSet, root);
+            return treeSet; // Если последний элемент меньше заданного, то вернём все элементы
+        }
+        addHeadSet(treeSet, root, toElement);
+        return treeSet; // Ищем максимальный элемент, меньший заданного
+    }
+
+    public void addHeadSet(SortedSet<T> sortedSet, Node<T> node, T toElement) {
+        int comparison = node.value.compareTo(toElement);
+        if (comparison < 0) {
+            sortedSet.add(node.value);
+            if (node.left != null) addSet(sortedSet, node.left);
+            if (node.right != null) {
+                addHeadSet(sortedSet, node.right, toElement);
+            }
+
+        } else {
+            if (node.left != null) addHeadSet(sortedSet, node.left, toElement);
+        }
+    }
+
+    public void addSet(SortedSet<T> sortedSet, Node<T> node) {
+        sortedSet.add(node.value);
+        if (node.left != null) addSet(sortedSet, node.left);
+        if (node.right != null) addSet(sortedSet, node.right);
     }
 
     /**
@@ -183,9 +218,40 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        // TODO
-        throw new NotImplementedError();
+         /* трудоемкость =
+           ресурсоемкость =
+        */
+        TreeSet<T> treeSet = new TreeSet<>();
+
+        if (root == null) return treeSet;  // Если дерево пустое, возвращаем пустое множество
+
+        int comparison = last().compareTo(fromElement);
+        if (comparison < 0) return treeSet; // Если последний элемент меньше заданного, также возвращаем пустое множество
+
+        comparison = first().compareTo(fromElement);
+        if (comparison >= 0) {
+            addSet(treeSet, root);
+            return treeSet; // Если первый элемент больше или равен заданному, то вернём все элементы
+        }
+
+        addTailSet(treeSet, root, fromElement);
+        return treeSet; // Ищем минимальный элемент, больший или равный заданному
     }
+
+
+    public void addTailSet(SortedSet<T> sortedSet, Node<T> node, T fromElement) {
+        int comparison = node.value.compareTo(fromElement);
+
+        if (comparison >= 0){
+            sortedSet.add(node.value);
+            if (node.right != null)
+                addSet(sortedSet, node.right);
+        }
+        else {
+            if (node.left != null) addTailSet(sortedSet, node.left, fromElement);
+        }
+    }
+
 
     @Override
     public T first() {
