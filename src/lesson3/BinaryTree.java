@@ -182,13 +182,14 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         int comparison = first().compareTo(toElement);
         if (comparison > 0) return treeSet; // Если первый элемент больше заданного, также возвращаем пустое множество
 
-        comparison = last().compareTo(toElement);
+        comparison = last().compareTo(toElement); // Если последний элемент меньше заданного, то вернём все элементы
+
         if (comparison < 0) {
             addSet(treeSet, root);
-            return treeSet; // Если последний элемент меньше заданного, то вернём все элементы
+            return treeSet; // Ищем максимальный элемент, меньший заданного
         }
         addHeadSet(treeSet, root, toElement);
-        return treeSet; // Ищем максимальный элемент, меньший заданного
+        return treeSet;
     }
 
     public void addHeadSet(SortedSet<T> sortedSet, Node<T> node, T toElement) {
@@ -228,14 +229,15 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         int comparison = last().compareTo(fromElement);
         if (comparison < 0) return treeSet; // Если последний элемент меньше заданного, также возвращаем пустое множество
 
-        comparison = first().compareTo(fromElement);
+        comparison = first().compareTo(fromElement); // Если первый элемент больше или равен заданному, то вернём все элементы
+
         if (comparison >= 0) {
             addSet(treeSet, root);
-            return treeSet; // Если первый элемент больше или равен заданному, то вернём все элементы
+            return treeSet; // Ищем минимальный элемент, больший или равный заданному
         }
 
         addTailSet(treeSet, root, fromElement);
-        return treeSet; // Ищем минимальный элемент, больший или равный заданному
+        return treeSet;
     }
 
 
