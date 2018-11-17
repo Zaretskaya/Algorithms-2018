@@ -1,7 +1,9 @@
 package lesson3
 
-import java.util.SortedSet
-import kotlin.test.*
+import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 abstract class AbstractHeadTailTest {
     private lateinit var tree: SortedSet<Int>

@@ -22,9 +22,23 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         }
     }
 
+    private class ExtendTreeSet<T> extends TreeSet<T> {
+        @Override
+        public boolean remove(Object o) {
+            BinaryTree.this.remove(o);
+            return removeInternal(o);
+        }
+
+        public boolean removeInternal(Object o) {
+            return super.remove(o);
+        }
+    }
+    ExtendTreeSet<T> treeSet = new ExtendTreeSet<>();
     private Node<T> root = null;
 
     private int size = 0;
+
+    private T fromElement = null, toElement = null;
 
     @Override
     public boolean add(T t) {
@@ -46,6 +60,10 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             closest.right = newNode;
         }
         size++;
+
+        if ((fromElement == null || fromElement.compareTo(t) <= 0) &&
+                (toElement == null || toElement.compareTo(t) > 0))
+            treeSet.add(t);
         return true;
     }
 
@@ -66,8 +84,40 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
      */
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        T t = (T) o;
+        remove(root, t);
+        size --;
+        return treeSet.removeInternal(o);
+    }
+
+    public Node<T> remove (Node<T> root, T removedElement) {
+        if (root == null)
+            return root;
+        if (removedElement.compareTo(root.value) < 0)
+            root.left = remove(root.left, removedElement);
+        else {
+            if (removedElement.compareTo(root.value) > 0) {
+                root.right = remove(root.right, removedElement);
+            } else {
+                if (root.left != null && root.right != null) {
+                    Node<T> newRoot = new Node<>(min(root.right).value);
+                    newRoot.left = root.left;
+                    newRoot.right = root.right;
+                    root = newRoot;
+                } else {
+                    if (root.left != null) {
+                        root = root.left;
+                    } else root = root.right;
+                }
+            }
+        }
+        return root;
+    }
+
+    public Node<T> min(Node<T> root) {
+        if (root == null)
+            return root;
+        return min(root.left);
     }
 
     @Override
@@ -172,25 +222,31 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        /* трудоемкость =
-           ресурсоемкость =
+        /* трудоемкость = О(n)
+           ресурсоемкость = O(n)
         */
-        TreeSet<T> treeSet = new TreeSet<>();
-
-        if (root == null) return treeSet; // Если дерево пустое, возвращаем пустое множество
-
+        this.toElement = toElement;
+        if (root == null) return treeSet;
         int comparison = first().compareTo(toElement);
-        if (comparison > 0) return treeSet; // Если первый элемент больше заданного, также возвращаем пустое множество
-
-        comparison = last().compareTo(toElement); // Если последний элемент меньше заданного, то вернём все элементы
-
+        if (comparison > 0) return treeSet;
+        comparison = last().compareTo(toElement);
         if (comparison < 0) {
             addSet(treeSet, root);
-            return treeSet; // Ищем максимальный элемент, меньший заданного
+            return treeSet;
         }
+
         addHeadSet(treeSet, root, toElement);
+        Iterator<T> iterator = treeSet.iterator();
+        T element;
+        while (iterator.hasNext()) {
+            element = iterator.next();
+            if (toElement.compareTo(element) <= 0) {
+                iterator.remove();
+            }
+        }
         return treeSet;
     }
+
 
     public void addHeadSet(SortedSet<T> sortedSet, Node<T> node, T toElement) {
         int comparison = node.value.compareTo(toElement);
@@ -200,7 +256,6 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             if (node.right != null) {
                 addHeadSet(sortedSet, node.right, toElement);
             }
-
         } else {
             if (node.left != null) addHeadSet(sortedSet, node.left, toElement);
         }
@@ -212,44 +267,53 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         if (node.right != null) addSet(sortedSet, node.right);
     }
 
+
+
     /**
      * Найти множество всех элементов больше или равных заданного
      * Сложная
      */
     @NotNull
     @Override
+    /* трудоемкость = О(n)
+       ресурсоемкость = O(n)
+    */
     public SortedSet<T> tailSet(T fromElement) {
-         /* трудоемкость =
-           ресурсоемкость =
-        */
-        TreeSet<T> treeSet = new TreeSet<>();
-
-        if (root == null) return treeSet;  // Если дерево пустое, возвращаем пустое множество
-
+        this.fromElement = fromElement;
+        if (root == null) return treeSet;
         int comparison = last().compareTo(fromElement);
-        if (comparison < 0) return treeSet; // Если последний элемент меньше заданного, также возвращаем пустое множество
+        if (comparison < 0) {
+            treeSet.clear();
+            return treeSet;
+        }
 
-        comparison = first().compareTo(fromElement); // Если первый элемент больше или равен заданному, то вернём все элементы
+        comparison = first().compareTo(fromElement);
 
         if (comparison >= 0) {
             addSet(treeSet, root);
-            return treeSet; // Ищем минимальный элемент, больший или равный заданному
+            return treeSet;
         }
 
         addTailSet(treeSet, root, fromElement);
+        Iterator<T> iterator = treeSet.iterator();
+        T element;
+
+        while (iterator.hasNext()) {
+            element = iterator.next();
+            if (fromElement.compareTo(element) > 0)
+                iterator.remove();
+        }
         return treeSet;
     }
 
 
     public void addTailSet(SortedSet<T> sortedSet, Node<T> node, T fromElement) {
         int comparison = node.value.compareTo(fromElement);
-
         if (comparison >= 0){
             sortedSet.add(node.value);
             if (node.right != null)
                 addSet(sortedSet, node.right);
-        }
-        else {
+        } else {
             if (node.left != null) addTailSet(sortedSet, node.left, fromElement);
         }
     }
@@ -275,3 +339,4 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         return current.value;
     }
 }
+
