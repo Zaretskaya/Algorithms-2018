@@ -37,10 +37,18 @@ abstract class AbstractHeadTailTest {
         assertEquals(false, set.contains(9))
         assertEquals(false, set.contains(10))
 
-
         set = tree.headSet(127)
         for (i in 1..10)
             assertEquals(true, set.contains(i))
+
+        val binarySet = BinaryTree<Int>()
+        try {
+            binarySet.headSet(4)
+        } catch (e: NoSuchElementException) {}
+
+        try {
+            tree.headSet(null)
+        } catch (e: NoSuchElementException) {}
 
     }
 
@@ -60,6 +68,15 @@ abstract class AbstractHeadTailTest {
         set = tree.tailSet(-128)
         for (i in 1..10)
             assertEquals(true, set.contains(i))
+
+        val binarySet = BinaryTree<Int>()
+        try {
+            binarySet.tailSet(4)
+        } catch (e: NoSuchElementException) {}
+
+        try {
+            tree.tailSet(null)
+        } catch (e: NoSuchElementException) {}
 
     }
 
