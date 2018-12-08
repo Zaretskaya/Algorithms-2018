@@ -2,8 +2,7 @@ package lesson5;
 
 import kotlin.NotImplementedError;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
@@ -94,7 +93,17 @@ public class JavaGraphTasks {
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
      */
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
-        throw new NotImplementedError();
+        Set<Graph.Vertex> set = graph.getVertices();
+        Set<Graph.Vertex> neighbors;
+        for (Graph.Vertex vertex: graph.getVertices()) {
+            if (set.contains(vertex)) {
+                neighbors = graph.getNeighbors(vertex);
+                for (Graph.Vertex neighbor: neighbors) {
+                    set.remove(neighbor);
+                }
+            }
+        }
+        return set;
     }
 
     /**
@@ -118,6 +127,45 @@ public class JavaGraphTasks {
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
      */
     public static Path longestSimplePath(Graph graph) {
-        throw new NotImplementedError();
+        if (graph == null)
+            return null;
+        LinkedList<Path> setPathes = new LinkedList<>();
+        List<Graph.Vertex> vertices;
+        int lengthPath;
+
+        // Собираем начала всех путей
+        for (Graph.Vertex vertex: graph.getVertices())
+            setPathes.add(new Path(vertex));
+
+        // Ищем продолжения путей
+        Iterator<Path> pathIterator = setPathes.iterator();
+        Path currentPath;
+        boolean setIsChanged; // Признак изменения множества
+        while (pathIterator.hasNext()) {
+            currentPath = pathIterator.next();
+            setIsChanged = false;
+            vertices = currentPath.getVertices();
+            lengthPath = vertices.size();
+            // Получаем конец пути и ищем его соседей
+            Graph.Vertex lastVertex = vertices.get(lengthPath - 1);
+            Set<Graph.Vertex> neighbors = graph.getNeighbors(lastVertex);
+            // Если сосед не содержится в пути, то путь можно продлить этим соседом
+            for (Graph.Vertex neighbor: neighbors) {
+                if (!currentPath.contains(neighbor)) {
+                    Path newPath = new Path(currentPath, graph, neighbor);
+                    setIsChanged = true;
+                    setPathes.add(newPath);
+                }
+            }
+            if (setIsChanged) {
+                setPathes.remove(currentPath);
+                pathIterator = setPathes.iterator();
+            }
+        }
+        Path pathMaxLength = setPathes.getFirst();
+        for (Path path: setPathes)
+            if (pathMaxLength.getLength() < path.getLength())
+                pathMaxLength = path;
+        return pathMaxLength;
     }
 }
