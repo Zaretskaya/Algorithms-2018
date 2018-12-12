@@ -82,6 +82,15 @@ public class JavaGraphTasks {
      * |
      * E
      *
+     *
+     *      G -- H -- J
+     *      |
+     * A -- B -- D
+     * |         |
+     * C -- F    I
+     * |
+     * E
+     *
      * Найти в нём самое большое независимое множество вершин и вернуть его.
      * Никакая пара вершин в независимом множестве не должна быть связана ребром.
      *
@@ -93,6 +102,9 @@ public class JavaGraphTasks {
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
      */
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
+        // трудоемкость = O(n^2) (в худшем случае)
+        // ресурсоемкость = O(n)
+
         Set<Graph.Vertex> set = graph.getVertices();
         Set<Graph.Vertex> neighbors;
         for (Graph.Vertex vertex: graph.getVertices()) {
@@ -103,8 +115,18 @@ public class JavaGraphTasks {
                 }
             }
         }
+
+        Set<Graph.Vertex> result = graph.getVertices();
+        if(graph.getVertices().size() - set.size() > set.size()) {
+            Iterator iterator = set.iterator();
+            while (iterator.hasNext()) {
+                result.remove(iterator.next());
+            }
+            return result;
+        }
         return set;
     }
+
 
     /**
      * Наидлиннейший простой путь.
@@ -127,6 +149,8 @@ public class JavaGraphTasks {
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
      */
     public static Path longestSimplePath(Graph graph) {
+        // трудоемкость = O(n^2)
+        // ресурсоемкость = O(n)
         if (graph == null)
             return null;
         LinkedList<Path> setPathes = new LinkedList<>();
