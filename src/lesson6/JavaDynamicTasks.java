@@ -39,6 +39,9 @@ public class JavaDynamicTasks {
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
     public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
+        // трудоемкость = O(n^3)
+        // ресурсоемкость = O(n)
+
         // Если в последовательности меньше двух элементов, то её и возвращаем
         if (list.size() < 2 )
             return new ArrayList<>(list);
@@ -127,6 +130,9 @@ public class JavaDynamicTasks {
      * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
      */
     public static int shortestPathOnField(String inputName) throws IOException {
+        // трудоемкость = O(n^2)
+        // ресурсоемкость = O(n)
+
         ArrayList<ArrayList<Integer>> field = new ArrayList<ArrayList<Integer>>();
         BufferedReader reader = new BufferedReader(new FileReader(inputName));
         String string;
